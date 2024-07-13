@@ -5,9 +5,13 @@ local conf = require("telescope.config").values
 
 local M = {}
 
+local wrapChDir = function(cmd)
+  return "cd \"" .. vim.fn.expand("%:p:h") .. "\" && " .. cmd
+end
+
 local get_current_exercise_name = function()
   -- run `gym workout parse <filename>` on the current file
-  handle = io.popen("gym workout parse " .. vim.fn.expand("%:p"))
+  handle = io.popen(wrapChDir("gym workout parse " .. vim.fn.expand("%:p")))
   result = handle:read("*a")
   handle:close()
 
@@ -29,7 +33,8 @@ local get_current_exercise_name = function()
 end
 
 local get_exercise_history = function(name)
-  return vim.fn.systemlist("gym exercise history --locations-only \"" .. name .. "\"")
+  -- Run the command in the same directory as the current file
+  return vim.fn.systemlist(wrapChDir("gym exercise history -lf \"" .. name .. "\""))
 end
 
 
@@ -47,12 +52,15 @@ M.picker = function(opts)
     finder = finders.new_table {
       results = get_exercise_history(name),
       entry_maker = function(entry)
-        local filename, lineno = string.match(entry, "(.*):(%d+)")
+        local filepath, lineno = string.match(entry, "(.*):(%d+)")
+        -- Get the file name from the full path in a cross-platform way
+        local filename = vim.fn.fnamemodify(filepath, ":t")
         return {
-          value = entry,
-          display = entry,
-          ordinal = entry,
+          value = filename,
+          display = filename,
+          ordinal = filename,
           filename = filename,
+          path = filepath,
           lnum = tonumber(lineno),
         }
       end
@@ -61,7 +69,7 @@ M.picker = function(opts)
       define_preview = function(self, entry, status)
         local bufnr = self.state.bufnr
         vim.api.nvim_buf_set_option(bufnr, 'filetype', 'gym')
-        vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.fn.readfile(entry.filename))
+        vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.fn.readfile(entry.path))
         vim.fn.setpos('.', {bufnr, entry.lnum, 0, 0})
         vim.cmd('normal! zz')
         vim.api.nvim_buf_add_highlight(bufnr, -1, 'Search', entry.lnum - 1, 0, -1)
