@@ -2,12 +2,9 @@ local pickers = require "telescope.pickers"
 local previewers = require "telescope.previewers"
 local finders = require "telescope.finders"
 local conf = require("telescope.config").values
+local wrapChDir = require("utils").wrapChDir
 
 local M = {}
-
-local wrapChDir = function(cmd)
-  return "cd \"" .. vim.fn.expand("%:p:h") .. "\" && " .. cmd
-end
 
 local get_current_exercise_name = function()
   local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
