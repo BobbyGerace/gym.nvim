@@ -10,11 +10,11 @@ local wrapChDir = function(cmd)
 end
 
 local get_current_exercise_name = function()
-  -- run `gym workout parse <filename>` on the current file
-  handle = io.popen(wrapChDir("gym workout parse " .. vim.fn.expand("%:p")))
-  result = handle:read("*a")
-  handle:close()
+  local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local input_data = table.concat(buffer_content, "\n")
 
+  -- pass buffer content into stdin
+  local result = vim.fn.system('gym workout parse', input_data)
   -- decode the JSON response inside a try/catch block
   local ok, response = pcall(vim.fn.json_decode, result)
 
@@ -34,7 +34,14 @@ end
 
 local get_exercise_history = function(name)
   -- Run the command in the same directory as the current file
-  return vim.fn.systemlist(wrapChDir("gym exercise history -lf \"" .. name .. "\""))
+  local result = vim.fn.systemlist(wrapChDir("gym exercise history -lf \"" .. name .. "\""))
+
+  -- If the command fails, return an empty list
+  if vim.v.shell_error ~= 0 then
+    return {}
+  end
+
+  return result
 end
 
 
@@ -47,10 +54,17 @@ M.picker = function(opts)
     return
   end
 
+  local results = get_exercise_history(name)
+
+  if #results == 0 then
+    vim.api.nvim_err_writeln("No history found for " .. name)
+    return
+  end
+
   pickers.new(opts, {
     prompt_title = name .." History",
     finder = finders.new_table {
-      results = get_exercise_history(name),
+      results = results,
       entry_maker = function(entry)
         local filepath, lineno = string.match(entry, "(.*):(%d+)")
         -- Get the file name from the full path in a cross-platform way
