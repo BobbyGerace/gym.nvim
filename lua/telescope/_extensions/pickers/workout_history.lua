@@ -2,7 +2,7 @@ local pickers = require "telescope.pickers"
 local previewers = require "telescope.previewers"
 local finders = require "telescope.finders"
 local conf = require("telescope.config").values
-local wrapChDir = require("utils").wrapChDir
+local utils = require("utils")
 
 local M = {}
 
@@ -25,7 +25,7 @@ end
 local get_workout_history = function(name)
   local command = name and "gym workout history -flN \"" .. name .. "\"" or "gym workout history -fl"
   -- Run the command in the same directory as the current file
-  local result = vim.fn.systemlist(wrapChDir(command))
+  local result = vim.fn.systemlist(utils.wrapChDir(command))
 
   -- If the command fails, return an empty list
   if vim.v.shell_error ~= 0 then
@@ -64,13 +64,7 @@ M.workout_history_picker = function(opts)
         }
       end
     },
-    previewer = previewers.new_buffer_previewer({
-      define_preview = function(self, entry, status)
-        local bufnr = self.state.bufnr
-        vim.api.nvim_buf_set_option(bufnr, 'filetype', 'gym')
-        vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.fn.readfile(entry.path))
-      end,
-    }),
+    previewer = utils.gym_file_previewer,
     sorter = conf.file_sorter(opts),
   }):find()
 end
