@@ -8,7 +8,7 @@ return require("telescope").register_extension {
     exercise_history = exercise_history.picker,
     exercises = exercises.picker,
     workout_history = workout_history.workout_history_picker,
-    current_workout_type_history = workout_history.current_workout_type_history_picker,
+    current_workout_name_history = workout_history.current_workout_name_history_picker,
     prs = prs.picker,
   },
 } 

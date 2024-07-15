@@ -6,6 +6,23 @@ function M.wrapChDir(cmd)
   return "cd \"" .. vim.fn.expand("%:p:h") .. "\" && " .. cmd
 end
 
+function M.get_current_workout_name()
+  local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  local input_data = table.concat(buffer_content, "\n")
+
+  -- pass buffer content into stdin
+  local result = vim.fn.system('gym workout parse', input_data)
+  -- decode the JSON response inside a try/catch block
+  local ok, response = pcall(vim.fn.json_decode, result)
+
+  if not ok then
+    return nil
+  end
+
+  return response.frontMatter and response.frontMatter.name
+end
+
+
 function M.get_current_exercise_name()
   local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
   local input_data = table.concat(buffer_content, "\n")

@@ -6,22 +6,6 @@ local utils = require("utils")
 
 local M = {}
 
-local get_current_workout_name = function()
-  local buffer_content = vim.api.nvim_buf_get_lines(0, 0, -1, false)
-  local input_data = table.concat(buffer_content, "\n")
-
-  -- pass buffer content into stdin
-  local result = vim.fn.system('gym workout parse', input_data)
-  -- decode the JSON response inside a try/catch block
-  local ok, response = pcall(vim.fn.json_decode, result)
-
-  if not ok then
-    return nil
-  end
-
-  return response.frontMatter and response.frontMatter.name
-end
-
 local get_workout_history = function(name)
   local command = name and "gym workout history -flN \"" .. name .. "\"" or "gym workout history -fl"
   -- Run the command in the same directory as the current file
@@ -69,10 +53,10 @@ M.workout_history_picker = function(opts)
   }):find()
 end
 
-M.current_workout_type_history_picker = function(opts)
+M.current_workout_name_history_picker = function(opts)
   opts = opts or {}
 
-  local name = get_current_workout_name()
+  local name = utils.get_current_workout_name()
   if name == nil then
     vim.api.nvim_err_writeln("Not in a named workout")
     return
