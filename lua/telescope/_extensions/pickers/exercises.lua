@@ -1,10 +1,9 @@
 local pickers = require "telescope.pickers"
-local previewers = require "telescope.previewers"
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local finders = require "telescope.finders"
 local conf = require("telescope.config").values
-local wrapChDir = require("utils").wrapChDir
+local utils = require("utils").wrapChDir
 
 local M = {}
 
@@ -46,6 +45,7 @@ M.picker = function(opts)
         }
       end
     },
+    previewer = utils.gym_file_previewer,
     sorter = conf.generic_sorter(opts),
     -- Set the default action to put the exercise name in at the cursor lotaion
     attach_mappings = function(prompt_bufnr)

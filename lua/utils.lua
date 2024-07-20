@@ -56,9 +56,15 @@ M.gym_file_previewer = previewers.new_buffer_previewer({
       return
     end
 
-    vim.fn.setpos('.', {bufnr, entry.lnum, 0, 0})
-    vim.cmd('normal! zz')
-    vim.api.nvim_buf_add_highlight(bufnr, -1, 'Search', entry.lnum - 1, 0, -1)
+    vim.schedule(function()
+      vim.fn.setpos('.', {bufnr, entry.lnum, 0, 0})
+      vim.api.nvim_buf_add_highlight(bufnr, -1, 'Search', entry.lnum - 1, 0, -1)
+      pcall(vim.api.nvim_win_set_cursor, self.state.winid, { entry.lnum , 0 })
+      vim.api.nvim_buf_call(bufnr, function()
+        vim.cmd('norm! zz')
+        vim.cmd('syntax sync fromstart');
+      end)
+    end)
   end,
 })
 
