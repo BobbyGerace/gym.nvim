@@ -3,7 +3,7 @@ local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local finders = require "telescope.finders"
 local conf = require("telescope.config").values
-local utils = require("utils").wrapChDir
+local wrapChDir = require("utils").wrapChDir
 
 local M = {}
 
