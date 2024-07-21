@@ -2,7 +2,7 @@
 
 A neovim plugin for logging workouts with [gym](https://github.com/BobbyGerace/gym).
 
-![gym.nvim](https://github.com/user-attachments/assets/a7a0af7f-d9c1-4f2c-bdcd-eeeeedf9a627)
+![gym.nvim](https://github.com/user-attachments/assets/a3caffb2-ce13-470b-a786-5a35ef590a01)
 
 Includes:
 
