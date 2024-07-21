@@ -45,7 +45,6 @@ M.picker = function(opts)
         }
       end
     },
-    previewer = utils.gym_file_previewer,
     sorter = conf.generic_sorter(opts),
     -- Set the default action to put the exercise name in at the cursor lotaion
     attach_mappings = function(prompt_bufnr)
