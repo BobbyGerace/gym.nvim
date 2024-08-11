@@ -20,7 +20,6 @@ With Packer:
 ```lua
 use {
   'BobbyGerace/gym.nvim',
-  requires = {'BobbyGerace/gym'},
   config = function()
     require'gym'.setup()
   end
